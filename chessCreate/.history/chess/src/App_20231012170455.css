@@ -1,0 +1,48 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+}
+.app{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color: #413636;
+}
+.board{
+    width: calc(64px * 8);
+    height: calc(64px * 8);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+.cell{
+    height: 64px;
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.white{
+    background-color: rgb(99, 132, 162);
+}
+.black{
+    background-color: rgb(47, 50, 54);
+}
+.available{
+    width: 10px;
+    height: 410px;
+    background-color: rgb(29, 206, 147);
+    border-radius: 50%;
+    z-index: 100;
+}
+.selected{
+    background-color: plum;
+}

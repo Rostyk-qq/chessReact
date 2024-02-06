@@ -1,0 +1,3 @@
+почнемо з canMove 
+для Figure првірки типу 
+if(previosFigureColor === curreny)

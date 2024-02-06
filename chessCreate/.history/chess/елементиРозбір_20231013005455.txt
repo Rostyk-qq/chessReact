@@ -1,0 +1,129 @@
+
+canMove початкова провірка для того шоб ми не могли бити своїх по корольрах
+
+для Figure првірки типу 
+if(previosFigureColor === current){
+    return false
+}
+return true
+
+всі дочірні отримують
+if(super.canMove()) - тобто в задежності шо певерне ця функція 
+
+cellComponent 
+<div onClick={e => click(cell)} style={{backgroundColor: cell.available && cell.figure ? 'green' : ''}} - фігури для биття 
+className={['cell', cell.color, selected && !cell.figure ? 'selected' : ''].join(' ')}> і вибір путих фігур 
+
+    {cell.available && !cell.figure && <div className='available'></div>} ходи відображаємо 
+    {cell.figure?.logo && <img src={cell.figure?.logo} width={40} height={40} />}
+
+</div>
+ми для цьго створюємо available style тобто для показу можливих ходів 
+і selected для вибору 
+
+
+клік 2 рази в BoardComponent
+    ми створюємо state для того шоб зробити 2 кліка 
+    const [clicked, setClicked] = useState<Cell | null>(null)
+
+    const click = (cell: Cell) => {
+        тут ми робимо провірку яка відділяє 2 кліка тобто ми пишемо якшо cell !== clicked і тільки тоді ми йдемо далі 
+        і всі вилики з основою clicked для cell (cell це наступний клік)
+        if(clicked && cell !== clicked && clicked.figure?.canMove(cell)){
+            clicked.moveFigure(cell); тут ми робимо переміщення 
+            setClicked(null) обнуляємо стару позицію
+        }
+        else{
+            якшо не виконалося то це 1 клік 
+            setClicked(cell)
+        }
+    }
+
+розберемо метод який переставляє фігури moveFigure
+в Cell 
+move(figure: Figure){ тут ми займаємося новою клітинокю так як ми викликали цей метод з основою target а це нова клітинка
+        this.figure = figure присвоюємо новиу фігуру 
+        this.figure.cell = this і для figure.cell беремо цей клас тобто оновлений  
+    }
+    moveFigure(target: Cell){
+        this.figure?.PawnStart(target); цей метод буде потрібен для Pawn перший хід 
+
+        if(this.figure && this.figure?.canMove(target)){ тут ми дивимося чи на 1 клікує фігура і canMove для target
+            target.move(this.figure) з основою target передаємо фігуру
+            this.figure = null після обнулюємо її 
+        }
+    }
+
+
+Примітка ми в class Figure і constructor робимо fluent interface 
+для cell 
+this.cell.figure = this; для того шоб ми могли отримувати властивості 
+
+
+і оновлення змін повязані з board 
+ми в Board створюємо 2 методи саме оновлення всіх available для кожної клітинки тої шо ми клікнули 1 раз 
+і стіворення нового instance 
+
+refresh(target: Cell | null){
+    for(let i = 0; i < this.cells.length; i++){
+        const row: Cell[] = this.cells[i];
+        for(let j = 0; j < row.length; j++){
+            let cell = row[i];
+            cell.available = !!target.figure.canMove(cell); - переводимо в falsy trufy
+        }
+    }
+}     
+
+createNewInstance(){
+    const newBoard = new Board();
+    newBoard.cells = this.cells
+    return newBoard;
+}
+
+далі в BoardComponent
+
+useEffect(() => {
+        refresh()
+    }, [clicked])
+
+    const refresh = () => {
+         board.doRefreshFigures(clicked)
+         createNewInstance()
+    } 
+    const createNewInstance = () => {
+        const newBoard = board.createNewInstance();
+        setBoard(newBoard)
+    }
+    при кожному кліку ми робимо оновлення
+    і тому зміни будуть відобрежені 
+
+
+далі розставлення ходів ми основні методи записуємо в Cell 
+ми ці методи будемо використовувати в canMove() 
+тобто ми будемо вказувати куда можна йти(і де буде відображатися available бо він реагує на кожну зміну)
+
+розставлення ходів для діагоналі 
+
+ moveDiagonal(target: Cell){
+    тут dx і dy мусять буди однокові так як це діаганаль і їхня різниця тобто минулого кілку і теперішнього це якраз 
+    відстанб між ними
+        const dx = Math.abs(target.x - this.x); 
+        const dy = Math.abs(target.y - this.y);
+
+        напрямок якшо - то вверх якшо + то вниз  
+        const directionX = this.x < target.x ? 1 : -1;    
+        const directionY = this.y < target.y ? 1 : -1;
+
+        і якшо вони не рівні то це не діагональ 
+        if(dx !== dy){
+            return false;
+        }
+        тут ми до нашого минулого кліку додаємо і * на напрямок і провіряємо чи пусти кожна клітинка якшо ні то ми зразу повертаємо false 
+        ми первертаємо ці значення() бо ці методи будуть використовуватися в 
+        for (let i = 1; i < dy; i++) {
+            if(!this.board.getCell(this.y + (i * directionY), this.x + (i * directionX)).isEmpty()){
+                return false;
+            }
+        }
+        return true;
+    }

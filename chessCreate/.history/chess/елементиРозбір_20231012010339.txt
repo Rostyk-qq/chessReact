@@ -1,0 +1,7 @@
+почнемо з canMove 
+для Figure првірки типу 
+if(previosFigureColor === current){
+    return false
+}
+return true
+

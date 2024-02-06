@@ -1,0 +1,28 @@
+import { Figure } from "./Figure"
+import { Cell } from "../Cell"
+import { Color } from "../Color"
+import { FigureName } from "./Figure"
+
+import rookWhite from '../../assets/white-rook.png'
+import rookBlack from '../../assets/black-rook.png'
+
+export class Rook extends Figure{
+    constructor(color: Color, cell: Cell) {
+        super(color, cell)
+        this.logo = color === Color.WHITE ? rookWhite : rookBlack
+        this.figureName = FigureName.ROOK
+    }
+
+    public canMove(target: Cell){
+        if(!super.canMove(target)){
+           return false 
+        }   
+        if(this.cell.moveVertical(target)){
+            return false
+        }
+        if(this.cell.moveHorizontal(target)){
+            return false
+        }
+        return true
+   }
+}
